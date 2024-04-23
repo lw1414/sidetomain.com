@@ -15,20 +15,6 @@ const std::vector<std::string> desiredAddresses = {
   // Add more addresses as needed
 };
 
-String hexToString(const uint8_t* data, size_t length) {
-  String result = "";
-  for (int i = 0; i < length; i++) {
-    result += static_cast<char>(data[i]);
-  }
-  // Remove the last character if it is a newline
-  if (result.endsWith("\n")) {
-    result.remove(result.length() - 1);
-  }
-  return result;
-}
-
-
-
 class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
     void onResult(BLEAdvertisedDevice advertisedDevice) {
       std::string deviceAddress = advertisedDevice.getAddress().toString();
@@ -44,17 +30,13 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
           if (advertisedDevice.haveServiceData()) {
             Serial.print("  Service Data (Raw): ");
 
-            const std::string& serviceDataStr = advertisedDevice.getServiceData();
-            size_t serviceDataLength = serviceDataStr.length();
-            uint8_t serviceData[serviceDataLength];
+            const uint8_t* serviceData = reinterpret_cast<const uint8_t*>(advertisedDevice.getServiceData().data());
+            size_t serviceDataLength = advertisedDevice.getServiceData().length();
 
             for (int i = 0; i < serviceDataLength; i++) {
-              serviceData[i] = static_cast<uint8_t>(serviceDataStr[i]);
               Serial.printf("%02X ", serviceData[i]);
             }
-
-            String convertedString = hexToString(serviceData, serviceDataLength);
-            Serial.println("\nConverted ASCII: " + convertedString);//this is to translate data as a ASCII
+            Serial.println();
             Serial.printf("  Service Data Length: %d\n", serviceDataLength);
           }
           Serial.println("----------");
@@ -62,7 +44,6 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
         }
       }
     }
-
 };
 
 void setup() {
@@ -78,7 +59,6 @@ void setup() {
 }
 
 void loop() {
-
   BLEScanResults foundDevices = pBLEScan->start(scanTime, false);
   Serial.print("Devices found: ");
   Serial.println(foundDevices.getCount());
