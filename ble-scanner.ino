@@ -54,7 +54,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
             }
 
             String convertedString = hexToString(serviceData, serviceDataLength);
-            Serial.println("\nConverted ASCII: " + convertedString);
+            Serial.println("\nConverted ASCII: " + convertedString);//this is to translate data as a ASCII
             Serial.printf("  Service Data Length: %d\n", serviceDataLength);
           }
           Serial.println("----------");
